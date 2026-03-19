@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <title>建物設備能源使用資料</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 30px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h4 {
+            background: #007bff;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+
+        .form-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        table input {
+            min-width: 100px;
+        }
+
+        button.btn-success,
+        button.btn-danger {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* ✅ 灰階透明化效果 */
+        .disabled-section {
+            opacity: 0.5;
+            pointer-events: none;
+            /* 禁止互動 */
+            filter: grayscale(80%);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>建物設備能源使用資料</h2>
+        <form id="energySystemForm" method="POST" action="{% url 'energy_system_form' %}">
+            {% csrf_token %}
+            <div class="form-section">
+                <h4>基本建物資料上傳</h4>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">（一）請貴院協助提供院所組織圖，及欲測建物各樓層配置圖：</label><br>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="diagram[]" value="組織圖">
+                        <label class="form-check-label">組織圖</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="diagram[]" value="院區配置圖">
+                        <label class="form-check-label">院區配置圖</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="diagram[]" value="各樓層配置圖">
+                        <label class="form-check-label">各樓層配置圖</label>
+                    </div>
+
+                    <!-- 上傳區 -->
+                    <div class="mt-2">
+                        <label class="form-label">上傳配置圖（可多檔）：</label>
+                        <input type="file" name="layout_files" multiple class="form-control">
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">（二）是否有進行 ISO-14064 組織型溫室氣體盤查？</label><br>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="iso14064" value="無" checked>
+                        <label class="form-check-label">無</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="iso14064" value="有">
+                        <label class="form-check-label">有</label>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">若已有 14064 組織型溫室氣體盤查，請填寫：</label>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>全院區：</label>
+                            <input type="text" name="area_name" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label>年排放：</label>
+                            <input type="number" step="0.01" name="emission" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label>公噸 CO₂e</label>
+                            <input type="number" step="0.01" name="emission" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 一、照明系統 -->
+            <div class="form-section">
+                <h4>1、照明系統</h4>
+                <table class="table table-bordered align-middle text-center" id="lightingTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>燈具種類</th>
+                            <th>燈具規格</th>
+                            <th>燈具額定功率(W)</th>
+                            <th>數量</th>
+                            <th>運轉時數(小時/日)</th>
+                            <th>運作天數(日/年)</th>
+                            <th style="width:80px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="text" name="light_type[]" class="form-control"></td>
+                            <td><input type="text" name="light_spec[]" class="form-control"></td>
+                            <td><input type="number" name="light_power[]" class="form-control"></td>
+                            <td><input type="number" name="light_count[]" class="form-control"></td>
+                            <td><input type="number" name="light_hours[]" class="form-control"></td>
+                            <td><input type="number" name="light_days[]" class="form-control"></td>
+                            <td>
+                                <button type="button" class="btn btn-success"
+                                    onclick="addRow('lightingTable', this)">+</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="form-check form-check-inline">
+                <h3><input class="form-check-input" type="checkbox" id="noAirSystem" name="diagram[]" value="無空調系統"
+                        onchange="toggleAirSystem()"></h3>
+                <label class="form-check-label" for="noAirSystem">
+                    <h3>無空調系統</h3>
+                </label>
+            </div>
+            <!-- 二、空調系統（冰水主機） -->
+            <div class="form-section" id="airSection">
+                <h4>2、空調系統（冰水主機）</h4>
+                <table class="table table-bordered align-middle text-center" id="airTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>型式</th>
+                            <th>數量</th>
+                            <th>冷卻能力(RT)</th>
+                            <th>功率(kW)</th>
+                            <th>冷卻水出口溫度(°C)</th>
+                            <th>負載率(%)</th>
+                            <th style="width:80px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="text" name="ac_type[]" class="form-control"></td>
+                            <td><input type="number" name="ac_count[]" class="form-control"></td>
+                            <td><input type="number" name="ac_capacity[]" class="form-control"></td>
+                            <td><input type="number" name="ac_power[]" class="form-control"></td>
+                            <td><input type="number" step="0.1" name="ac_out_temp[]" class="form-control"></td>
+                            <td><input type="number" name="ac_load[]" class="form-control"></td>
+                            <td>
+                                <button type="button" class="btn btn-success"
+                                    onclick="addRow('airTable', this)">+</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- 三、輸冰系統 -->
+            <div class="form-section" id="iceSection">
+                <h4>2.1、輸冰系統</h4>
+                <table class="table table-bordered align-middle text-center" id="iceTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>輸冰主機型號</th>
+                            <th>數量</th>
+                            <th>冷卻能力(kcal/hr)</th>
+                            <th>運轉時數(小時/日)</th>
+                            <th>運作天數(日/年)</th>
+                            <th style="width:80px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="text" name="ice_model[]" class="form-control"></td>
+                            <td><input type="number" name="ice_count[]" class="form-control"></td>
+                            <td><input type="number" name="ice_capacity[]" class="form-control"></td>
+                            <td><input type="number" name="ice_hours[]" class="form-control"></td>
+                            <td><input type="number" name="ice_days[]" class="form-control"></td>
+                            <td>
+                                <button type="button" class="btn btn-success"
+                                    onclick="addRow('iceTable', this)">+</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- 四、鍋爐系統 -->
+            <div class="form-section">
+                <h4>3、鍋爐系統</h4>
+
+                <!-- 3.1 鍋爐運轉方式 -->
+                <h5 class="mt-3 fw-bold">3.1 鍋爐運轉方式</h5>
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label>運轉時數（小時/日）</label>
+                        <input type="number" name="boiler_hours[]" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label>運作天數（日/年）</label>
+                        <input type="number" name="boiler_days[]" class="form-control">
+                    </div>
+                </div>
+
+                <!-- 3.2 鍋爐規格 -->
+                <h5 class="mt-3 fw-bold">3.2 鍋爐規格</h5>
+                <table class="table table-bordered text-center align-middle" id="boilerTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>類型</th>
+                            <th>台數</th>
+                            <th>蒸汽壓力 (kg/cm²)</th>
+                            <th>蒸汽量 (kg/hr)</th>
+                            <th>效率 (%)</th>
+                            <th>燃料種類</th>
+                            <th style="width:80px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="text" name="boiler_type[]" class="form-control"></td>
+                            <td><input type="number" name="boiler_count[]" class="form-control"></td>
+                            <td><input type="number" name="boiler_pressure[]" class="form-control"></td>
+                            <td><input type="number" name="boiler_steam[]" class="form-control"></td>
+                            <td><input type="number" name="boiler_eff[]" class="form-control"></td>
+                            <td><input type="text" name="boiler_fuel[]" class="form-control"></td>
+                            <td>
+                                <button type="button" class="btn btn-success"
+                                    onclick="addRow('boilerTable', this)">+</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 3.3 燃料消耗量 -->
+                <h5 class="fw-bold">3.3 燃料消耗量</h5>
+                <table class="table table-bordered align-middle text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th>燃料種類</th>
+                            <th>年度用量</th>
+                            <th>單位</th>
+                            <th>備註</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="text" name="fuel_type[]" class="form-control"></td>
+                            <td><input type="number" name="fuel_amount[]" class="form-control"></td>
+                            <td><input type="text" name="fuel_unit[]" class="form-control"></td>
+                            <td><input type="text" name="fuel_note[]" class="form-control"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 五、電梯系統 -->
+            <div class="form-section">
+                <h4>4、電梯系統</h4>
+                <p class="text-muted">□電梯動能回收裝置 □高低樓層分流運量 □睡眠時段停用部分電梯</p>
+                <table class="table table-bordered align-middle text-center" id="elevatorTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th rowspan="2">項目</th>
+                            <th colspan="5">使用率</th>
+                        </tr>
+                        <tr>
+                            <th>1</th>
+                            <th>2</th>
+                            <th>3</th>
+                            <th>4</th>
+                            <th>5</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>載重(kg)</strong></td>
+                            <td><input type="number" name="elevator_weight_1[]" class="form-control"></td>
+                            <td><input type="number" name="elevator_weight_2[]" class="form-control"></td>
+                            <td><input type="number" name="elevator_weight_3[]" class="form-control"></td>
+                            <td><input type="number" name="elevator_weight_4[]" class="form-control"></td>
+                            <td><input type="number" name="elevator_weight_5[]" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>馬達效率等級<br>(IE2、IE3、IE4等)</strong></td>
+                            <td><input type="text" name="elevator_efficiency_1[]" class="form-control"></td>
+                            <td><input type="text" name="elevator_efficiency_2[]" class="form-control"></td>
+                            <td><input type="text" name="elevator_efficiency_3[]" class="form-control"></td>
+                            <td><input type="text" name="elevator_efficiency_4[]" class="form-control"></td>
+                            <td><input type="text" name="elevator_efficiency_5[]" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>設備數量(台數)</strong></td>
+                            <td><input type="number" name="elevator_count_1[]" class="form-control"></td>
+                            <td><input type="number" name="elevator_count_2[]" class="form-control"></td>
+                            <td><input type="number" name="elevator_count_3[]" class="form-control"></td>
+                            <td><input type="number" name="elevator_count_4[]" class="form-control"></td>
+                            <td><input type="number" name="elevator_count_5[]" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>製造廠商</strong></td>
+                            <td><input type="text" name="elevator_manufacturer_1[]" class="form-control"></td>
+                            <td><input type="text" name="elevator_manufacturer_2[]" class="form-control"></td>
+                            <td><input type="text" name="elevator_manufacturer_3[]" class="form-control"></td>
+                            <td><input type="text" name="elevator_manufacturer_4[]" class="form-control"></td>
+                            <td><input type="text" name="elevator_manufacturer_5[]" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>動力電源(∅/V/Hz)</strong></td>
+                            <td><input type="text" name="elevator_power_1[]" class="form-control"></td>
+                            <td><input type="text" name="elevator_power_2[]" class="form-control"></td>
+                            <td><input type="text" name="elevator_power_3[]" class="form-control"></td>
+                            <td><input type="text" name="elevator_power_4[]" class="form-control"></td>
+                            <td><input type="text" name="elevator_power_5[]" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>主機功率(kW)</strong></td>
+                            <td><input type="number" step="0.01" name="elevator_main_power_1[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="elevator_main_power_2[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="elevator_main_power_3[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="elevator_main_power_4[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="elevator_main_power_5[]" class="form-control">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>額格馬力(HP)</strong></td>
+                            <td><input type="number" step="0.01" name="elevator_hp_1[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_hp_2[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_hp_3[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_hp_4[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_hp_5[]" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>主機效率(cfm/馬力)</strong></td>
+                            <td><input type="number" step="0.01" name="elevator_main_eff_1[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_main_eff_2[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_main_eff_3[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_main_eff_4[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_main_eff_5[]" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>速度(m/min)</strong></td>
+                            <td><input type="number" step="0.01" name="elevator_speed_1[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_speed_2[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_speed_3[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_speed_4[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_speed_5[]" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>變壓器容量(KVA)</strong></td>
+                            <td><input type="number" step="0.01" name="elevator_transformer_1[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="elevator_transformer_2[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="elevator_transformer_3[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="elevator_transformer_4[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="elevator_transformer_5[]" class="form-control">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>控制器容量(A)</strong></td>
+                            <td><input type="number" step="0.01" name="elevator_controller_1[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="elevator_controller_2[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="elevator_controller_3[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="elevator_controller_4[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="elevator_controller_5[]" class="form-control">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>引入電纜線徑(mm²)</strong></td>
+                            <td><input type="number" step="0.01" name="elevator_cable_1[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_cable_2[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_cable_3[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_cable_4[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_cable_5[]" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>放電曲線(kcal.HP)</strong></td>
+                            <td><input type="number" step="0.01" name="elevator_discharge_1[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="elevator_discharge_2[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="elevator_discharge_3[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="elevator_discharge_4[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="elevator_discharge_5[]" class="form-control">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>運轉時數(小時/日)</strong></td>
+                            <td><input type="number" step="0.01" name="elevator_hours_1[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_hours_2[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_hours_3[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_hours_4[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="elevator_hours_5[]" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>運作天數(日/年)</strong></td>
+                            <td><input type="number" name="elevator_days_1[]" class="form-control"></td>
+                            <td><input type="number" name="elevator_days_2[]" class="form-control"></td>
+                            <td><input type="number" name="elevator_days_3[]" class="form-control"></td>
+                            <td><input type="number" name="elevator_days_4[]" class="form-control"></td>
+                            <td><input type="number" name="elevator_days_5[]" class="form-control"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 六、空壓系統 -->
+            <div class="form-check form-check-inline">
+                <h3><input class="form-check-input" type="checkbox" id="noAirCompressor" name="diagram[]" value="無空壓系統"
+                        onchange="toggleAirCompressor()"></h3>
+                <label class="form-check-label" for="noAirCompressor">
+                    <h3>無空壓系統</h3>
+                </label>
+            </div>
+            <div class="form-section" id="airCompressorSection">
+                <h4>5、空壓系統</h4>
+                <p class="text-muted">□無空壓系統</p>
+                <table class="table table-bordered align-middle text-center" id="airCompressorTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th rowspan="2">項目</th>
+                            <th colspan="5">使用率</th>
+                        </tr>
+                        <tr>
+                            <th>1</th>
+                            <th>2</th>
+                            <th>3</th>
+                            <th>4</th>
+                            <th>5</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>規格馬力(Hp)</strong></td>
+                            <td><input type="number" step="0.01" name="compressor_hp_1[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="compressor_hp_2[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="compressor_hp_3[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="compressor_hp_4[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="compressor_hp_5[]" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>馬達效率等級<br>(IE2、IE3、IE4等)</strong></td>
+                            <td><input type="text" name="compressor_efficiency_1[]" class="form-control"></td>
+                            <td><input type="text" name="compressor_efficiency_2[]" class="form-control"></td>
+                            <td><input type="text" name="compressor_efficiency_3[]" class="form-control"></td>
+                            <td><input type="text" name="compressor_efficiency_4[]" class="form-control"></td>
+                            <td><input type="text" name="compressor_efficiency_5[]" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>設備數量(台數)</strong></td>
+                            <td><input type="number" name="compressor_count_1[]" class="form-control"></td>
+                            <td><input type="number" name="compressor_count_2[]" class="form-control"></td>
+                            <td><input type="number" name="compressor_count_3[]" class="form-control"></td>
+                            <td><input type="number" name="compressor_count_4[]" class="form-control"></td>
+                            <td><input type="number" name="compressor_count_5[]" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>平均負載率</strong></td>
+                            <td><input type="number" step="0.01" name="compressor_load_1[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="compressor_load_2[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="compressor_load_3[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="compressor_load_4[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="compressor_load_5[]" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>主機效率(cfm/馬力)</strong></td>
+                            <td><input type="number" step="0.01" name="compressor_main_eff_1[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="compressor_main_eff_2[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="compressor_main_eff_3[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="compressor_main_eff_4[]" class="form-control">
+                            </td>
+                            <td><input type="number" step="0.01" name="compressor_main_eff_5[]" class="form-control">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>主機功率(kW)</strong></td>
+                            <td><input type="number" step="0.01" name="compressor_power_1[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="compressor_power_2[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="compressor_power_3[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="compressor_power_4[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="compressor_power_5[]" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>運轉時數(小時/日)</strong></td>
+                            <td><input type="number" step="0.01" name="compressor_hours_1[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="compressor_hours_2[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="compressor_hours_3[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="compressor_hours_4[]" class="form-control"></td>
+                            <td><input type="number" step="0.01" name="compressor_hours_5[]" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>運作天數(日/年)</strong></td>
+                            <td><input type="number" name="compressor_days_1[]" class="form-control"></td>
+                            <td><input type="number" name="compressor_days_2[]" class="form-control"></td>
+                            <td><input type="number" name="compressor_days_3[]" class="form-control"></td>
+                            <td><input type="number" name="compressor_days_4[]" class="form-control"></td>
+                            <td><input type="number" name="compressor_days_5[]" class="form-control"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-center">
+                <a href="/building_form/" class="btn btn-secondary btn-lg">⬅ 上一頁</a>
+                <button class="btn btn-primary btn-lg" type="submit" id="exportWordBtn">匯出Word</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        function toggleAirSystem() {
+            const isChecked = document.getElementById("noAirSystem").checked;
+            const airSection = document.getElementById("airSection");
+            const iceSection = document.getElementById("iceSection");
+
+            const airInputs = document.querySelectorAll("#airTable input, #airTable button");
+            const iceInputs = document.querySelectorAll("#iceTable input, #iceTable button");
+
+            // ✅ 禁用/啟用所有輸入元件
+            airInputs.forEach(el => el.disabled = isChecked);
+            iceInputs.forEach(el => el.disabled = isChecked);
+
+            // ✅ 整個區塊變灰透明
+            if (isChecked) {
+                airSection.classList.add("disabled-section");
+                iceSection.classList.add("disabled-section");
+            } else {
+                airSection.classList.remove("disabled-section");
+                iceSection.classList.remove("disabled-section");
+            }
+        }
+
+        function toggleAirCompressor() {
+            const isChecked = document.getElementById("noAirCompressor").checked;
+            const airCompressorSection = document.getElementById("airCompressorSection");
+
+            const compressorInputs = document.querySelectorAll("#airCompressorTable input, #airCompressorTable button");
+
+            // ✅ 禁用/啟用所有輸入元件
+            compressorInputs.forEach(el => el.disabled = isChecked);
+
+            // ✅ 整個區塊變灰透明
+            if (isChecked) {
+                airCompressorSection.classList.add("disabled-section");
+            } else {
+                airCompressorSection.classList.remove("disabled-section");
+            }
+        }
+
+        function addRow(tableId, btn) {
+            const tbody = document.getElementById(tableId).querySelector("tbody");
+            const currentRow = btn.closest("tr");
+
+            // 將當前列的 "+" 改為 "-"
+            btn.textContent = "-";
+            btn.classList.remove("btn-success");
+            btn.classList.add("btn-danger");
+            btn.setAttribute("onclick", "removeRow('" + tableId + "', this)");
+
+            // 複製新列
+            const newRow = currentRow.cloneNode(true);
+            newRow.querySelectorAll("input").forEach(input => input.value = "");
+
+            // 新列的按鈕設為 "+"
+            const newBtn = newRow.querySelector("button");
+            newBtn.textContent = "+";
+            <tr>
+                <td><strong>運作天數(日/年)</strong></td>
+                <td><input type="number" name="compressor_days_1[]" class="form-control"></td>
+                <td><input type="number" name="compressor_days_2[]" class="form-control"></td>
+                <td><input type="number" name="compressor_days_3[]" class="form-control"></td>
+                <td><input type="number" name="compressor_days_4[]" class="form-control"></td>
+                <td><input type="number" name="compressor_days_5[]" class="form-control"></td>
+            </tr>
+                    </tbody >
+                </table >
+            </div >
+
+                <div class="text-center">
+                    <a href="/building_form/" class="btn btn-secondary btn-lg">⬅ 上一頁</a>
+                    <button class="btn btn-primary btn-lg" type="submit" id="exportWordBtn">匯出Word</button>
+                </div>
+        </form >
+    </div >
+                <script>
+                    function toggleAirSystem() {
+            const isChecked = document.getElementById("noAirSystem").checked;
+                    const airSection = document.getElementById("airSection");
+                    const iceSection = document.getElementById("iceSection");
+
+                    const airInputs = document.querySelectorAll("#airTable input, #airTable button");
+                    const iceInputs = document.querySelectorAll("#iceTable input, #iceTable button");
+
+            // ✅ 禁用/啟用所有輸入元件
+            airInputs.forEach(el => el.disabled = isChecked);
+            iceInputs.forEach(el => el.disabled = isChecked);
+
+                    // ✅ 整個區塊變灰透明
+                    if (isChecked) {
+                        airSection.classList.add("disabled-section");
+                    iceSection.classList.add("disabled-section");
+            } else {
+                        airSection.classList.remove("disabled-section");
+                    iceSection.classList.remove("disabled-section");
+            }
+        }
+
+                    function toggleAirCompressor() {
+            const isChecked = document.getElementById("noAirCompressor").checked;
+                    const airCompressorSection = document.getElementById("airCompressorSection");
+
+                    const compressorInputs = document.querySelectorAll("#airCompressorTable input, #airCompressorTable button");
+
+            // ✅ 禁用/啟用所有輸入元件
+            compressorInputs.forEach(el => el.disabled = isChecked);
+
+                    // ✅ 整個區塊變灰透明
+                    if (isChecked) {
+                        airCompressorSection.classList.add("disabled-section");
+            } else {
+                        airCompressorSection.classList.remove("disabled-section");
+            }
+        }
+
+                    function addRow(tableId, btn) {
+            const tbody = document.getElementById(tableId).querySelector("tbody");
+                    const currentRow = btn.closest("tr");
+
+                    // 將當前列的 "+" 改為 "-"
+                    btn.textContent = "-";
+                    btn.classList.remove("btn-success");
+                    btn.classList.add("btn-danger");
+                    btn.setAttribute("onclick", "removeRow('" + tableId + "', this)");
+
+                    // 複製新列
+                    const newRow = currentRow.cloneNode(true);
+            newRow.querySelectorAll("input").forEach(input => input.value = "");
+
+                    // 新列的按鈕設為 "+"
+                    const newBtn = newRow.querySelector("button");
+                    newBtn.textContent = "+";
+                    newBtn.classList.remove("btn-danger");
+                    newBtn.classList.add("btn-success");
+                    newBtn.setAttribute("onclick", "addRow('" + tableId + "', this)");
+
+                    // 插入新列
+                    tbody.appendChild(newRow);
+        }
+
+                    function removeRow(tableId, btn) {
+            const tbody = document.getElementById(tableId).querySelector("tbody");
+                    const rows = tbody.querySelectorAll("tr");
+                    const row = btn.closest("tr");
+
+                    // 若只剩一列，不允許刪除
+                    if (rows.length === 1) {
+                        alert("至少保留一列資料！");
+                    return;
+            }
+
+                    const rowIndex = Array.from(rows).indexOf(row);
+                    row.remove();
+
+                    // 若刪除的是最後一列前一列，需讓它恢復成 "+"
+                    const remainingRows = tbody.querySelectorAll("tr");
+                    if (rowIndex === remainingRows.length) {
+                const lastRow = remainingRows[remainingRows.length - 1];
+                    const lastBtn = lastRow.querySelector("button");
+                    lastBtn.textContent = "+";
+                    lastBtn.classList.remove("btn-danger");
+                    lastBtn.classList.add("btn-success");
+                    lastBtn.setAttribute("onclick", "addRow('" + tableId + "', this)");
+            }
+        }
+    </script>
+
+    {{ saved_data|json_script:"saved-data" }}
+    <script>
+            // 預填充保存的數據
+            const savedDataElement = document.getElementById('saved-data');
+            const savedData = savedDataElement ? JSON.parse(savedDataElement.textContent) : { };
+
+            window.addEventListener('DOMContentLoaded', function () {
+            if (savedData && Object.keys(savedData).length > 0) {
+                // 遍歷所有保存的數據
+                for (const [key, value] of Object.entries(savedData)) {
+                    if (!value || key === 'csrfmiddlewaretoken') continue;
+
+            // 處理 checkbox 類型
+            if (key === 'diagram[]') {
+                        if (Array.isArray(value)) {
+                value.forEach(v => {
+                    const checkbox = document.querySelector(`input[type="checkbox"][value="${v}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+                        } else {
+                            const checkbox = document.querySelector(`input[type="checkbox"][value="${value}"]`);
+            if (checkbox) checkbox.checked = true;
+                        }
+            // 觸發相應的 toggle 函數
+            if (value.includes && value.includes('無空調系統')) {
+                document.getElementById('noAirSystem').checked = true;
+            toggleAirSystem();
+                        }
+            if (value.includes && value.includes('無空壓系統')) {
+                document.getElementById('noAirCompressor').checked = true;
+            toggleAirCompressor();
+                        }
+            continue;
+                    }
+
+            // 處理 radio buttons
+            if (key === 'iso14064') {
+                        const radio = document.querySelector(`input[type="radio"][name="${key}"][value="${value}"]`);
+            if (radio) radio.checked = true;
+            continue;
+                    }
+
+            // 處理數組類型的輸入 (如照明、空調等表格數據)
+            if (Array.isArray(value)) {
+                        const inputs = document.querySelectorAll(`input[name="${key}"]`);
+                        value.forEach((v, index) => {
+                            if (inputs[index] && v) {
+                inputs[index].value = v;
+                            }
+                        });
+                    } else {
+                        // 處理單一值
+                        const input = document.querySelector(`input[name="${key}"]`);
+            if (input) {
+                input.value = value;
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

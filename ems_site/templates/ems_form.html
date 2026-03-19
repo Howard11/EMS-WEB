@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <title>EMS 申報資料填寫</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            padding: 20px;
+            color: #2f3640;
+        }
+
+        /* 手風琴標題樣式 */
+        .accordion-button {
+            background: #007bff;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background: #0056b3;
+            color: white;
+        }
+
+        .accordion-button::after {
+            filter: brightness(0) invert(1);
+        }
+
+        .accordion-button:focus {
+            box-shadow: none;
+        }
+
+        .accordion-item {
+            margin-bottom: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .accordion-body {
+            background: white;
+            padding: 20px;
+        }
+
+        label {
+            display: inline-block;
+            width: 220px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: calc(100% - 240px);
+            padding: 6px;
+            border: 1px solid #000;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        textarea {
+            height: 80px;
+        }
+
+        .form-row {
+            margin-bottom: 8px;
+        }
+
+        /* 導航按鈕容器 */
+        .section-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .btn-area {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* 統一按鈕樣式 */
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>EMS 能源使用資料填寫</h1>
+
+        <form id="emsForm" method="post">
+            {% csrf_token %}
+
+            <div class="accordion" id="emsAccordion">
+
+                <!-- 區塊 1：公司基本資料 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingCompany">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseCompany" aria-expanded="true" aria-controls="collapseCompany">
+                            公司基本資料
+                        </button>
+                    </h2>
+                    <div id="collapseCompany" class="accordion-collapse collapse show" aria-labelledby="headingCompany"
+                        data-bs-parent="#emsAccordion">
+                        <div class="accordion-body">
+                            <div class="form-row">{{ form.company_name.label_tag }} {{ form.company_name }}</div>
+                            <div class="form-row">{{ form.tax_id.label_tag }} {{ form.tax_id }}</div>
+                            <div class="form-row">{{ form.company_address.label_tag }} {{ form.company_address }}</div>
+                            <div class="form-row">{{ form.industry_type.label_tag }} {{ form.industry_type }}</div>
+                            <div class="form-row">{{ form.building_type.label_tag }} {{ form.building_type }}</div>
+                            <div class="form-row">{{ form.capital.label_tag }} {{ form.capital }}</div>
+                            <div class="form-row">{{ form.revenue.label_tag }} {{ form.revenue }}</div>
+                            <div class="form-row">{{ form.employees.label_tag }} {{ form.employees }}</div>
+                            <div class="section-nav">
+                                <div></div>
+                                <button type="button" class="btn btn-primary" onclick="goToSection('collapseContact')">
+                                    下一步 ▼
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 區塊 2：聯絡資料 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingContact">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseContact" aria-expanded="false" aria-controls="collapseContact">
+                            聯絡資料
+                        </button>
+                    </h2>
+                    <div id="collapseContact" class="accordion-collapse collapse" aria-labelledby="headingContact"
+                        data-bs-parent="#emsAccordion">
+                        <div class="accordion-body">
+                            <div class="form-row">{{ form.contact_name.label_tag }} {{ form.contact_name }}</div>
+                            <div class="form-row">{{ form.contact_title.label_tag }} {{ form.contact_title }}</div>
+                            <div class="form-row">{{ form.phone.label_tag }} {{ form.phone }}</div>
+                            <div class="form-row">{{ form.email.label_tag }} {{ form.email }}</div>
+                            <div class="section-nav">
+                                <button type="button" class="btn btn-secondary"
+                                    onclick="goToSection('collapseCompany')">
+                                    ▲ 上一步
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="goToSection('collapseElec')">
+                                    下一步 ▼
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 區塊 3：全區電力使用 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingElec">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseElec" aria-expanded="false" aria-controls="collapseElec">
+                            全區電力使用
+                        </button>
+                    </h2>
+                    <div id="collapseElec" class="accordion-collapse collapse" aria-labelledby="headingElec"
+                        data-bs-parent="#emsAccordion">
+                        <div class="accordion-body">
+                            <div class="form-row">{{ form.total_power_usage.label_tag }} {{ form.total_power_usage }}
+                            </div>
+                            <div class="form-row">{{ form.total_power_cost.label_tag }} {{ form.total_power_cost }}
+                            </div>
+                            <div class="section-nav">
+                                <button type="button" class="btn btn-secondary"
+                                    onclick="goToSection('collapseContact')">
+                                    ▲ 上一步
+                                </button>
+                                <button type="button" class="btn btn-primary"
+                                    onclick="goToSection('collapseNonElecUsage')">
+                                    下一步 ▼
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 區塊 4：非電力能源使用量 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingNonElecUsage">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseNonElecUsage" aria-expanded="false"
+                            aria-controls="collapseNonElecUsage">
+                            非電力能源使用量
+                        </button>
+                    </h2>
+                    <div id="collapseNonElecUsage" class="accordion-collapse collapse"
+                        aria-labelledby="headingNonElecUsage" data-bs-parent="#emsAccordion">
+                        <div class="accordion-body">
+                            <div class="form-row">{{ form.gas_usage.label_tag }} {{ form.gas_usage }}</div>
+                            <div class="form-row">{{ form.lpg_usage.label_tag }} {{ form.lpg_usage }}</div>
+                            <div class="form-row">{{ form.gasoline_usage.label_tag }} {{ form.gasoline_usage }}</div>
+                            <div class="form-row">{{ form.diesel_usage.label_tag }} {{ form.diesel_usage }}</div>
+                            <div class="form-row">{{ form.other_usage_1.label_tag }} {{ form.other_usage_1 }}</div>
+                            <div class="form-row">{{ form.other_usage_2.label_tag }} {{ form.other_usage_2 }}</div>
+                            <div class="section-nav">
+                                <button type="button" class="btn btn-secondary" onclick="goToSection('collapseElec')">
+                                    ▲ 上一步
+                                </button>
+                                <button type="button" class="btn btn-primary"
+                                    onclick="goToSection('collapseNonElecCost')">
+                                    下一步 ▼
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 區塊 5：非電力能源使用費用 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingNonElecCost">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseNonElecCost" aria-expanded="false"
+                            aria-controls="collapseNonElecCost">
+                            非電力能源使用費用
+                        </button>
+                    </h2>
+                    <div id="collapseNonElecCost" class="accordion-collapse collapse"
+                        aria-labelledby="headingNonElecCost" data-bs-parent="#emsAccordion">
+                        <div class="accordion-body">
+                            <div class="form-row">{{ form.gas_cost.label_tag }} {{ form.gas_cost }}</div>
+                            <div class="form-row">{{ form.lpg_cost.label_tag }} {{ form.lpg_cost }}</div>
+                            <div class="form-row">{{ form.gasoline_cost.label_tag }} {{ form.gasoline_cost }}</div>
+                            <div class="form-row">{{ form.diesel_cost.label_tag }} {{ form.diesel_cost }}</div>
+                            <div class="form-row">{{ form.other_cost_1.label_tag }} {{ form.other_cost_1 }}</div>
+                            <div class="form-row">{{ form.other_cost_2.label_tag }} {{ form.other_cost_2 }}</div>
+                            <div class="section-nav">
+                                <button type="button" class="btn btn-secondary"
+                                    onclick="goToSection('collapseNonElecUsage')">
+                                    ▲ 上一步
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="goToSection('collapseHeat')">
+                                    下一步 ▼
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 區塊 6：各類能源熱值 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingHeat">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseHeat" aria-expanded="false" aria-controls="collapseHeat">
+                            各類能源熱值
+                        </button>
+                    </h2>
+                    <div id="collapseHeat" class="accordion-collapse collapse" aria-labelledby="headingHeat"
+                        data-bs-parent="#emsAccordion">
+                        <div class="accordion-body">
+                            <div class="form-row">{{ form.gas_heat.label_tag }} {{ form.gas_heat }}</div>
+                            <div class="form-row">{{ form.lpg_heat.label_tag }} {{ form.lpg_heat }}</div>
+                            <div class="form-row">{{ form.gasoline_heat.label_tag }} {{ form.gasoline_heat }}</div>
+                            <div class="form-row">{{ form.diesel_heat.label_tag }} {{ form.diesel_heat }}</div>
+                            <div class="form-row">{{ form.other_heat_1.label_tag }} {{ form.other_heat_1 }}</div>
+                            <div class="form-row">{{ form.other_heat_2.label_tag }} {{ form.other_heat_2 }}</div>
+                            <div class="section-nav">
+                                <button type="button" class="btn btn-secondary"
+                                    onclick="goToSection('collapseNonElecCost')">
+                                    ▲ 上一步
+                                </button>
+                                <div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">💾 保存</button>
+                <button type="button" class="btn btn-success btn-lg mx-2" onclick="goToNextPage()">下一頁 ➡️
+                    欲量測建物資料填寫</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 切換到指定區塊
+        function goToSection(targetId) {
+            const targetCollapse = document.getElementById(targetId);
+            if (targetCollapse) {
+                const bsCollapse = new bootstrap.Collapse(targetCollapse, {
+                    toggle: true
+                });
+
+                setTimeout(() => {
+                    targetCollapse.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 350);
+            }
+        }
+
+        // 表單 AJAX 提交
+        document.getElementById("emsForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            fetch("", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(async response => {
+                    if (!response.ok) {
+                        const text = await response.text();
+                        throw new Error(`HTTP ${response.status}: ${text.substring(0, 100)}...`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === "ok") {
+                        alert(data.msg);
+                    } else {
+                        alert("❌ 儲存失敗：" + data.msg);
+                    }
+                })
+                .catch(err => {
+                    console.error("錯誤:", err);
+                    alert("⚠️ 伺服器錯誤：" + err.message);
+                });
+        });
+
+        // 跳轉到第二頁
+        function goToNextPage() {
+            window.location.href = "/building_form/";
+        }
+    </script>
+</body>
+
+</html>

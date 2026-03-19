@@ -1,0 +1,480 @@
+{
+    "layout_files": "",
+    "iso14064": "無",
+    "light_type[]": [
+        "燈管",
+        "小夜燈"
+    ],
+    "light_spec_type[]": [
+        "T5",
+        "T5"
+    ],
+    "light_spec_cap[]": [
+        "10",
+        "2"
+    ],
+    "light_spec_ballast[]": [
+        "22",
+        "20"
+    ],
+    "light_power[]": [
+        "5",
+        "2"
+    ],
+    "light_count[]": [
+        "5",
+        "500"
+    ],
+    "light_hours[]": [
+        "5",
+        "2"
+    ],
+    "light_days[]": [
+        "5",
+        "222"
+    ],
+    "light_saving": "無",
+    "ac_id[]": [
+        "123456",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_type[]": [
+        "氣冷式",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_type_other[]": [
+        "",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_comp_type[]": [
+        "螺旋式",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_comp_type_other[]": [
+        "",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_count[]": [
+        "20",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_capacity[]": [
+        "52",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_power_v[]": [
+        "500",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_brand[]": [
+        "三菱",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_model[]": [
+        "8486",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_buy_year[]": [
+        "2022",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_cool_cap[]": [
+        "80",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_comp_count[]": [
+        "2",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_hours[]": [
+        "5",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_refrigerant[]": [
+        "冷媒",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_out_temp[]": [
+        "50",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_load[]": [
+        "95",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_floor_area[]": [
+        "88",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ac_vfd[]": [
+        "是",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ice_id[]": [
+        "784564",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ice_type[]": [
+        "螺旋式",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ice_type_other[]": [
+        "",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ice_count[]": [
+        "5",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ice_capacity[]": [
+        "20",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ice_brand[]": [
+        "三菱",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ice_model[]": [
+        "546",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ice_buy_year[]": [
+        "2022",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ice_cool_cap[]": [
+        "45",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ice_comp_count[]": [
+        "55",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ice_load[]": [
+        "56",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ice_temp[]": [
+        "45",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ice_hours[]": [
+        "250",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "ice_days[]": [
+        "222",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "boiler_running_hours": "8555",
+    "boiler_running_days": "66",
+    "boiler_type_1": "水管式",
+    "boiler_type_2": "",
+    "boiler_type_3": "",
+    "boiler_capacity_1": "546",
+    "boiler_count_1": "5",
+    "boiler_capacity_2": "",
+    "boiler_count_2": "",
+    "boiler_capacity_3": "",
+    "boiler_count_3": "",
+    "boiler_power_1": "456",
+    "boiler_power_2": "",
+    "boiler_power_3": "",
+    "boiler_exhaust_temp_1": "40~50",
+    "boiler_exhaust_temp_2": "",
+    "boiler_exhaust_temp_3": "",
+    "boiler_year_1": "2022",
+    "boiler_year_2": "",
+    "boiler_year_3": "",
+    "boiler_water_1": "50",
+    "boiler_water_2": "",
+    "boiler_water_3": "",
+    "boiler_in_temp_1": "10~30",
+    "boiler_in_temp_2": "",
+    "boiler_in_temp_3": "",
+    "boiler_out_temp_1": "70~90",
+    "boiler_out_temp_2": "",
+    "boiler_out_temp_3": "",
+    "steam_usage[]": [
+        "製程",
+        "空調"
+    ],
+    "steam_press_process": "456",
+    "steam_press_ac": "645",
+    "steam_usage_other": "",
+    "steam_press_other": "",
+    "steam_leak": "無",
+    "condensate_recovery": "無",
+    "blowdown_method": "連續排放",
+    "boiler_exhaust_temp_single": "",
+    "hp_annual_demand[]": [
+        "50",
+        "",
+        ""
+    ],
+    "hp_in_temp[]": [
+        "10~20",
+        "",
+        ""
+    ],
+    "hp_out_temp[]": [
+        "50~70",
+        "",
+        ""
+    ],
+    "hp_year[]": [
+        "2022",
+        "",
+        ""
+    ],
+    "hp_fuel_price[]": [
+        "122",
+        "",
+        ""
+    ],
+    "hp_rated_power[]": [
+        "123",
+        "",
+        ""
+    ],
+    "hp_heating_capacity[]": [
+        "123",
+        "",
+        ""
+    ],
+    "hp_hours[]": [
+        "123",
+        "",
+        ""
+    ],
+    "hp_days[]": [
+        "13",
+        "",
+        ""
+    ],
+    "elevator_features[]": "電梯動能回收裝置",
+    "elevator_usage_1[]": "100",
+    "elevator_usage_2[]": "",
+    "elevator_usage_3[]": "",
+    "elevator_usage_4[]": "",
+    "elevator_usage_5[]": "",
+    "elevator_weight_1[]": "1000",
+    "elevator_weight_2[]": "",
+    "elevator_weight_3[]": "",
+    "elevator_weight_4[]": "",
+    "elevator_weight_5[]": "",
+    "elevator_efficiency_1[]": "IE4",
+    "elevator_efficiency_2[]": "",
+    "elevator_efficiency_3[]": "",
+    "elevator_efficiency_4[]": "",
+    "elevator_efficiency_5[]": "",
+    "elevator_count_1[]": "5",
+    "elevator_count_2[]": "",
+    "elevator_count_3[]": "",
+    "elevator_count_4[]": "",
+    "elevator_count_5[]": "",
+    "elevator_manufacturer_1[]": "東元",
+    "elevator_manufacturer_2[]": "",
+    "elevator_manufacturer_3[]": "",
+    "elevator_manufacturer_4[]": "",
+    "elevator_manufacturer_5[]": "",
+    "elevator_power_1[]": "HZ",
+    "elevator_power_2[]": "",
+    "elevator_power_3[]": "",
+    "elevator_power_4[]": "",
+    "elevator_power_5[]": "",
+    "elevator_main_power_1[]": "50",
+    "elevator_main_power_2[]": "",
+    "elevator_main_power_3[]": "",
+    "elevator_main_power_4[]": "",
+    "elevator_main_power_5[]": "",
+    "elevator_hp_1[]": "66",
+    "elevator_hp_2[]": "",
+    "elevator_hp_3[]": "",
+    "elevator_hp_4[]": "",
+    "elevator_hp_5[]": "",
+    "elevator_main_eff_1[]": "44",
+    "elevator_main_eff_2[]": "",
+    "elevator_main_eff_3[]": "",
+    "elevator_main_eff_4[]": "",
+    "elevator_main_eff_5[]": "",
+    "elevator_speed_1[]": "55",
+    "elevator_speed_2[]": "",
+    "elevator_speed_3[]": "",
+    "elevator_speed_4[]": "",
+    "elevator_speed_5[]": "",
+    "elevator_transformer_1[]": "22",
+    "elevator_transformer_2[]": "",
+    "elevator_transformer_3[]": "",
+    "elevator_transformer_4[]": "",
+    "elevator_transformer_5[]": "",
+    "elevator_controller_1[]": "22",
+    "elevator_controller_2[]": "",
+    "elevator_controller_3[]": "",
+    "elevator_controller_4[]": "",
+    "elevator_controller_5[]": "",
+    "elevator_cable_1[]": "22",
+    "elevator_cable_2[]": "",
+    "elevator_cable_3[]": "",
+    "elevator_cable_4[]": "",
+    "elevator_cable_5[]": "",
+    "elevator_discharge_1[]": "22",
+    "elevator_discharge_2[]": "",
+    "elevator_discharge_3[]": "",
+    "elevator_discharge_4[]": "",
+    "elevator_discharge_5[]": "",
+    "elevator_hours_1[]": "22",
+    "elevator_hours_2[]": "",
+    "elevator_hours_3[]": "",
+    "elevator_hours_4[]": "",
+    "elevator_hours_5[]": "",
+    "elevator_days_1[]": "22",
+    "elevator_days_2[]": "",
+    "elevator_days_3[]": "",
+    "elevator_days_4[]": "",
+    "elevator_days_5[]": "",
+    "compressor_usage_1[]": "221",
+    "compressor_usage_2[]": "",
+    "compressor_usage_3[]": "",
+    "compressor_usage_4[]": "",
+    "compressor_usage_5[]": "",
+    "compressor_hp_1[]": "21",
+    "compressor_hp_2[]": "",
+    "compressor_hp_3[]": "",
+    "compressor_hp_4[]": "",
+    "compressor_hp_5[]": "",
+    "compressor_efficiency_1[]": "IE4",
+    "compressor_efficiency_2[]": "",
+    "compressor_efficiency_3[]": "",
+    "compressor_efficiency_4[]": "",
+    "compressor_efficiency_5[]": "",
+    "compressor_count_1[]": "65",
+    "compressor_count_2[]": "",
+    "compressor_count_3[]": "",
+    "compressor_count_4[]": "",
+    "compressor_count_5[]": "",
+    "compressor_load_1[]": "456",
+    "compressor_load_2[]": "",
+    "compressor_load_3[]": "",
+    "compressor_load_4[]": "",
+    "compressor_load_5[]": "",
+    "compressor_main_eff_1[]": "46",
+    "compressor_main_eff_2[]": "",
+    "compressor_main_eff_3[]": "",
+    "compressor_main_eff_4[]": "",
+    "compressor_main_eff_5[]": "",
+    "compressor_power_1[]": "456",
+    "compressor_power_2[]": "",
+    "compressor_power_3[]": "",
+    "compressor_power_4[]": "",
+    "compressor_power_5[]": "",
+    "compressor_hours_1[]": "46",
+    "compressor_hours_2[]": "",
+    "compressor_hours_3[]": "",
+    "compressor_hours_4[]": "",
+    "compressor_hours_5[]": "",
+    "compressor_days_1[]": "456",
+    "compressor_days_2[]": "",
+    "compressor_days_3[]": "",
+    "compressor_days_4[]": "",
+    "compressor_days_5[]": ""
+}
